@@ -5,7 +5,7 @@ import { productApi } from "./../redux-store/product.effects";
 import AppContainer from "./../components/app-container";
 import SvgComponent from './../assets/icons/logo';
 
-export default function Container() {
+export default function HomeScreen() {
   const dispatch = useDispatch();
   const { data, error, isLoading } =
     productApi.endpoints.getAllProducts.useQuery();

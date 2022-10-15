@@ -2,9 +2,12 @@ import { Provider } from "react-redux";
 import store from "./src/redux-store/store";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
-import Container from "./src/screens/container.screen";
+// import Container from "./src/screens/container.screen";
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+// import { NavigationContainer } from '@react-navigation/native';
+import {AppNavigator} from './src/navigation/app.navigation';
+
 
 let persistor = persistStore(store);
 
@@ -27,7 +30,7 @@ export default function App() {
       
       <PersistGate loading={null} persistor={persistor}>
       <SafeAreaProvider>
-        <Container />
+        <AppNavigator/>
         </SafeAreaProvider>
       </PersistGate>
   
