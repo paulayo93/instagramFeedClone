@@ -1,7 +1,7 @@
 import * as React from "react";
-import Svg, { Path, Line, Rect } from "react-native-svg";
+import Svg, { Line, Rect } from "react-native-svg";
 
-export default function HomeIcon(props) {
+export default function Explore(props) {
   return (
     <Svg
       width="24"
@@ -10,6 +10,7 @@ export default function HomeIcon(props) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      <Rect width="24" height="24" fill="white" />
       <Rect
         x="3"
         y="3"

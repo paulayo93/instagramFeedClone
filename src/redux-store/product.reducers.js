@@ -20,8 +20,7 @@ const productReducer = createSlice({
       builder.addMatcher(
         productApi.endpoints.getAllProducts.matchFulfilled,
         (state, { payload }) => {
-          console.log(payload);
-          // state.loading = false;
+          state.loading = false;
           state.products = payload;
         }
       );

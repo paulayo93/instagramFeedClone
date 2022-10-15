@@ -1,7 +1,6 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Home from "./../assets/icons/home";
 import Like from "./../assets/icons/like";
 import HomeFilled from "./../assets/icons/home-filled";
 import { FavoritesStackScreen } from "./favorites.navigation";
