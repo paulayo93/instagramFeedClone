@@ -107,28 +107,15 @@ export default function HomeScreen({ navigation }) {
   const productInStore = useSelector((state) => state.product);
 
   useEffect(() => {
-    // const unsubscribe = navigation.addListener("focus", () => {
-    // console.log(productArr.length)
-      if (productInStore?.products.length <= 0) {
-        console.log('here is api store')
-        setProductArr(data);
-      } else if (productInStore.products.length > 0) {
-       
-      console.log(' here in local store')
-     
-        setProductArr(productInStore.products);
-        console.log(productArr, "productArr")
+    if (productInStore?.products.length <= 0) {
+      setProductArr(data);
+    } else if (productInStore.products.length > 0) {
 
-      
-      
-      }
-    // });
-
-    // return unsubscribe;
+      setProductArr(productInStore.products);
+    }
   }, [productInStore.products]);
 
   const addItemFavorite = (itemId) => {
- 
     dispatch(addFavorite({ itemId }));
   };
 
@@ -195,9 +182,8 @@ export default function HomeScreen({ navigation }) {
                 <ContentHeader />
                 <TouchableWithoutFeedback
                   onPress={
-                    () =>
-                      navigation.navigate("Detail", { product: item })
-                      // addItemFavorite(item.id)
+                    () => navigation.navigate("Detail", { product: item })
+                    // addItemFavorite(item.id)
                     // removeItemFavorite(item.id, item?.isFavorite)
                   }
                 >
