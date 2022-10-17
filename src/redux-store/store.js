@@ -1,6 +1,7 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import productReducers from "./product.reducers";
 import { productApi } from "./product.effects";
+
 import {
   persistReducer,
   FLUSH,
@@ -11,7 +12,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import logger from "redux-logger";
+// import logger from "redux-logger";
 const persistConfig = {
   key: "root",
   version: 1,
@@ -21,6 +22,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   product: productReducers,
   [productApi.reducerPath]: productApi.reducer,
+
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

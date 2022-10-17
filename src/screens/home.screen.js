@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { productApi } from "./../redux-store/product.effects";
+import { addFavorite, removeFavorite } from "./../redux-store/product.reducers";
 import AppContainer from "./../components/app-container";
 import { FlashList } from "@shopify/flash-list";
 import Logo from "./../assets/icons/logo";
@@ -67,7 +68,7 @@ const ContentHeader = () => {
         alignItems: "center",
         paddingHorizontal: 8,
         paddingVertical: 10,
-        marginBottom: 3
+        marginBottom: 3,
       }}
     >
       <Avatar />
@@ -78,33 +79,62 @@ const ContentHeader = () => {
 
 const Content = ({ image, video, type, title }) => {
   return (
-    <View style={{flex: 1, height: 400}}>
+    <View style={{ flex: 1, minHeight: 400 }}>
       <Image
-      style={{
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        position: "absolute",
-        // aspectRatio: 1
-      }}
+        style={{
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          position: "absolute",
+          aspectRatio: 1,
+        }}
         source={{
           uri: image,
         }}
-
         resizeMode="contain"
       />
-
     </View>
   );
 };
 
-export default function HomeScreen({navigation}) {
+export default function HomeScreen({ navigation }) {
+  const [productArr, setProductArr] = useState([]);
   const dispatch = useDispatch();
   const { data, error, isLoading } =
     productApi.endpoints.getAllProducts.useQuery();
 
-  // const getProductsStore = useSelector((state) => state.product);
+  const productInStore = useSelector((state) => state.product);
+
+  useEffect(() => {
+    // const unsubscribe = navigation.addListener("focus", () => {
+    // console.log(productArr.length)
+      if (productInStore?.products.length <= 0) {
+        console.log('here is api store')
+        setProductArr(data);
+      } else if (productInStore.products.length > 0) {
+       
+      console.log(' here in local store')
+     
+        setProductArr(productInStore.products);
+        console.log(productArr, "productArr")
+
+      
+      
+      }
+    // });
+
+    // return unsubscribe;
+  }, [productInStore.products]);
+
+  const addItemFavorite = (itemId) => {
+ 
+    dispatch(addFavorite({ itemId }));
+  };
+
+  const removeItemFavorite = (itemId, isFavorite) => {
+    dispatch(removeFavorite({ itemId, isFavorite }));
+  };
 
   return (
     <AppContainer
@@ -132,48 +162,50 @@ export default function HomeScreen({navigation}) {
             width: 112,
             height: 24,
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             paddingRight: 5,
           }}
         >
-          <TouchableWithoutFeedback onPress={() => null}>
+          {/* <TouchableWithoutFeedback onPress={() => null}>
             <Explore />
-          </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback> */}
 
-          <TouchableWithoutFeedback onPress={() => null}>
-            <Like />
-          </TouchableWithoutFeedback>
+          <TouchableOpacity onPress={() => navigation.navigate("Favorites")}>
+            <View>
+              <Like />
+            </View>
+          </TouchableOpacity>
 
-          <TouchableWithoutFeedback onPress={() => null}>
+          {/* <TouchableWithoutFeedback onPress={() => null}>
             <Messenger />
-          </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback> */}
         </View>
       </View>
 
       <FlashList
         ListHeaderComponent={<Header />}
-        data={data}
+        data={productArr || productInStore.products}
         estimatedItemSize={200}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => {
-          // console.log(item.image)
           return (
             <>
-              {/* <View style={{marginBottom: 40}}> */}
-
-            
+              <View style={{ marginBottom: 40 }}>
                 <ContentHeader />
-                <TouchableWithoutFeedback onPress={() => navigation.navigate('Detail', {product: item})}>
+                <TouchableWithoutFeedback
+                  onPress={
+                    () =>
+                      navigation.navigate("Detail", { product: item })
+                      // addItemFavorite(item.id)
+                    // removeItemFavorite(item.id, item?.isFavorite)
+                  }
+                >
                   <View>
-                  <Content image={item.image} />
-
+                    <Content image={item.image} />
                   </View>
-              
                 </TouchableWithoutFeedback>
-               
-                {/* </View> */}
-           
+              </View>
             </>
           );
         }}

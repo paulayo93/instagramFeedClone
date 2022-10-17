@@ -11,21 +11,35 @@ const productReducer = createSlice({
   name: "product",
   initialState,
   reducers: {
-    removeProduct: (state, action) => {
-      state.products = null;
+    addFavorite: (state, { payload: { itemId } }) => {
+      for (const obj of state.products) {
+        if (obj.id === itemId) {
+          obj.isFavorite = true;
+          break;
+        }
+      }
     },
-
+    removeFavorite: (state, { payload: { itemId, isFavorite } }) => {
+      if (isFavorite) {
+        for (const obj of state.products) {
+          if (obj.id === itemId && obj.isFavorite) {
+            obj.isFavorite = false;
+            break;
+          }
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
-      builder.addMatcher(
-        productApi.endpoints.getAllProducts.matchFulfilled,
-        (state, { payload }) => {
-          state.loading = false;
-          state.products = payload;
-        }
-      );
+    builder.addMatcher(
+      productApi.endpoints.getAllProducts.matchFulfilled,
+      (state, { payload }) => {
+        state.loading = false;
+        state.products = payload;
+      }
+    );
   },
 });
 
-export const { removeProduct } = productReducer.actions;
+export const { addFavorite, removeFavorite } = productReducer.actions;
 export default productReducer.reducer;

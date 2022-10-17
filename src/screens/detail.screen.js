@@ -40,25 +40,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-  },
-  videoContainer: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  videoElement: {
-    flex: 1
-  },
-  videoOverlay: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    backgroundColor: 'transparent',
-    right: 0,
-    top: 0,
-  },  
+  }
 });
 
 export default Detail;
