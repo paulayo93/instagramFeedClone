@@ -4,6 +4,7 @@ import {
   Text,
   View,
   TouchableWithoutFeedback,
+  TouchableOpacity,
   Image,
   ImageBackground,
 } from "react-native";
@@ -98,7 +99,7 @@ const Content = ({ image, video, type, title }) => {
   );
 };
 
-export default function HomeScreen() {
+export default function HomeScreen({navigation}) {
   const dispatch = useDispatch();
   const { data, error, isLoading } =
     productApi.endpoints.getAllProducts.useQuery();
@@ -153,16 +154,25 @@ export default function HomeScreen() {
         ListHeaderComponent={<Header />}
         data={data}
         estimatedItemSize={200}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => {
           // console.log(item.image)
           return (
             <>
-              <View style={{marginBottom: 40}}>
+              {/* <View style={{marginBottom: 40}}> */}
 
             
                 <ContentHeader />
-                <Content image={item.image} />
-                </View>
+                <TouchableWithoutFeedback onPress={() => navigation.navigate('Detail', {product: item})}>
+                  <View>
+                  <Content image={item.image} />
+
+                  </View>
+              
+                </TouchableWithoutFeedback>
+               
+                {/* </View> */}
            
             </>
           );
