@@ -1,104 +1,65 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useRef } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Dimensions,
-  ImageBackground,
-} from 'react-native';
-import { TapGestureHandler } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { Component } from "react";
+import { TouchableWithoutFeedback } from "react-native";
 
-const AnimatedImage = Animated.createAnimatedComponent(Image);
+export default class DoubleTap extends Component {
+  constructor(props) {
+    super(props);
 
-export default function App() {
-  const scale = useSharedValue(0);
-  const opacity = useSharedValue(1);
+    // time interval between double clicks
+    this.delayTime = props.delay ? props.delay : 150;
+    // bool to check whether user tapped once
+    this.firstPress = true;
+    // the last time user tapped
+    this.lastTime = new Date();
+    // a timer is used to run the single tap event
+    this.timer = false;
+  }
 
-  const doubleTapRef = useRef();
+  _onTap = () => {
+    // get the instance of time when pressed
+    let now = new Date().getTime();
 
-  const rStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: Math.max(scale.value, 0) }],
-  }));
+    if (this.firstPress) {
+      // set the flag indicating first press has occured
+      this.firstPress = false;
 
-  const rTextStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
+      //start a timer --> if a second tap doesnt come in by the delay, trigger singleTap event handler
+      this.timer = setTimeout(() => {
+        //check if user passed in prop
+        this.props.singleTap ? this.props.singleTap() : null;
 
-  const onDoubleTap = useCallback(() => {
-    scale.value = withSpring(1, undefined, (isFinished) => {
-      if (isFinished) {
-        scale.value = withDelay(500, withSpring(0));
+        // reset back to initial state
+        this.firstPress = true;
+        this.timer = false;
+      }, this.delayTime);
+
+      // mark the last time of the press
+      this.lastTime = now;
+    } else {
+      //if user pressed immediately again within span of delayTime
+      if (now - this.lastTime < this.delayTime) {
+        // clear the timeout for the single press
+        this.timer && clearTimeout(this.timer);
+
+        //check if user passed in prop for double click
+        this.props.doubleTap ? this.props.doubleTap() : null;
+
+        // reset back to initial state
+        this.firstPress = true;
       }
-    });
-  }, []);
+    }
+  };
 
-  const onSingleTap = useCallback(() => {
-    opacity.value = withTiming(0, undefined, (isFinished) => {
-      if (isFinished) {
-        opacity.value = withDelay(500, withTiming(1));
-      }
-    });
-  }, []);
+  render() {
+    return (
+      <TouchableWithoutFeedback activeOpacity={0} onPress={this._onTap}>
+        {this.props.children}
+      </TouchableWithoutFeedback>
+    );
+  }
 
-  return (
-    <View style={styles.container}>
-      <TapGestureHandler waitFor={doubleTapRef} onActivated={onSingleTap}>
-        <TapGestureHandler
-          maxDelayMs={250}
-          ref={doubleTapRef}
-          numberOfTaps={2}
-          onActivated={onDoubleTap}
-        >
-          <Animated.View>
-            <ImageBackground
-              source={require('./assets/image.jpeg')}
-              style={styles.image}
-            >
-              <AnimatedImage
-                source={require('./assets/heart.png')}
-                style={[
-                  styles.image,
-                  {
-                    shadowOffset: { width: 0, height: 20 },
-                    shadowOpacity: 0.35,
-                    shadowRadius: 35,
-                  },
-                  rStyle,
-                ]}
-                resizeMode={'center'}
-              />
-            </ImageBackground>
-            <Animated.Text style={[styles.turtles, rTextStyle]}>
-              🐢🐢🐢🐢
-            </Animated.Text>
-          </Animated.View>
-        </TapGestureHandler>
-      </TapGestureHandler>
-    </View>
-  );
+  componentWillUnmount() {
+    // make sure to clear the timer when unmounting
+    this.timer && clearTimeout(this.timer);
+  }
 }
-
-const { width: SIZE } = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: SIZE,
-    height: SIZE,
-  },
-  turtles: { fontSize: 40, textAlign: 'center', marginTop: 30 },
-});
