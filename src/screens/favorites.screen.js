@@ -137,21 +137,15 @@ export default function FavoritesScreen({navigation}) {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => {
-          // console.log(item.image)
           return (
             <>
               <View style={{marginTop: 10}}>
-
-            
                 <ContentHeader />
                 <TouchableWithoutFeedback onPress={() => navigation.navigate('Detail', {product: item})}>
                   <View>
                   <Content image={item.image} />
-
                   </View>
-              
                 </TouchableWithoutFeedback>
-               
                 </View>
            
             </>

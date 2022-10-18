@@ -25,7 +25,7 @@ const createScreenOptions = ({ route }) => {
 
 export const AppNavigator = ({ navigation, route }) => (
   <NavigationContainer>
-    <Tab.Navigator screenOptions={createScreenOptions}>
+    <Tab.Navigator initialRouteName="Home" screenOptions={createScreenOptions}>
       <Tab.Screen name="Home" component={HomeStackScreen} />
       <Tab.Screen name="Favorites" component={FavoritesStackScreen} />
     </Tab.Navigator>

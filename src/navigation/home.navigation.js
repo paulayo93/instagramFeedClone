@@ -11,8 +11,7 @@ export const HomeStackScreen = () => {
       screenOptions={{
         headerShown: false,
         headerMode: "none",
-      }}
-    >
+      }}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="Detail" component={DetailScreen} />
     </HomeStack.Navigator>

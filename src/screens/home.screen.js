@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ImageBackground,
+  Dimensions,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { productApi } from "./../redux-store/product.effects";
@@ -22,6 +23,18 @@ import color from "./../constants/colors";
 
 import dog from "./../assets/images/dog.png";
 import Option from "./../assets/icons/option";
+
+import { TapGestureHandler } from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming,
+  runOnJS,
+} from "react-native-reanimated";
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 const Header = ({ image, title, status }) => {
   return (
@@ -59,7 +72,7 @@ const Avatar = (props) => {
   );
 };
 
-const ContentHeader = () => {
+const ContentHeader = ({ navigation }) => {
   return (
     <View
       style={{
@@ -77,23 +90,95 @@ const ContentHeader = () => {
   );
 };
 
-const Content = ({ image, video, type, title }) => {
+const Content = ({ image, video, type, title, navigation, product }) => {
+  const scale = useSharedValue(0);
+  const opacity = useSharedValue(1);
+
+  const doubleTapRef = useRef();
+
+  const rStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: Math.max(scale.value, 0) }],
+  }));
+
+  const onDoubleTap = useCallback(() => {
+    // runOnJS(navigation.navigate)("Detail", { product });
+    // addItemFavorite(item.id)
+    // removeItemFavorite(item.id, item?.isFavorite)
+
+    scale.value = withSpring(1, undefined, (isFinished) => {
+      if (isFinished) {
+        scale.value = withDelay(500, withSpring(0));
+      }
+    });
+  }, []);
+
+  const navigatePage = () => {
+    runOnJS(navigation.navigate)("Detail", { product });
+  };
+
+  const onSingleTap = useCallback(() => {
+    console.log("run fucntion now");
+    // navigatePage();
+    // navigation.navigate("Detail", { product });
+
+    opacity.value = withTiming(0, undefined, (isFinished) => {
+      if (isFinished) {
+        opacity.value = withDelay(500, withTiming(1));
+      }
+    });
+  }, []);
+
   return (
     <View style={{ flex: 1, minHeight: 400 }}>
-      <Image
-        style={{
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          position: "absolute",
-          aspectRatio: 1,
-        }}
-        source={{
-          uri: image,
-        }}
-        resizeMode="contain"
-      />
+      <TapGestureHandler waitFor={doubleTapRef} onActivated={onSingleTap}>
+        <Animated.View>
+
+        <TapGestureHandler
+          maxDelayMs={250}
+          ref={doubleTapRef}
+          numberOfTaps={2}
+          onActivated={onDoubleTap}
+        >
+          <View>
+
+      
+          <Animated.View>
+            <View>
+
+         
+            <ImageBackground
+              style={{
+                aspectRatio: 1,
+              }}
+              source={{
+                uri: image,
+              }}
+              resizeMode="contain"
+            >
+            
+              <AnimatedImage
+                source={require("./../assets/images/heart.png")}
+                style={[
+                  styles.image,
+                  {
+                    shadowOffset: { width: 0, height: 20 },
+                    shadowOpacity: 0.35,
+                    shadowRadius: 35,
+                  },
+                  rStyle,
+                ]}
+                resizeMode={"center"}
+              />
+          
+            </ImageBackground>
+            </View>
+          
+
+          </Animated.View>
+          </View>
+        </TapGestureHandler>
+        </Animated.View>
+      </TapGestureHandler>
     </View>
   );
 };
@@ -107,11 +192,10 @@ export default function HomeScreen({ navigation }) {
   const productInStore = useSelector((state) => state.product);
 
   useEffect(() => {
-    if (productInStore?.products.length <= 0) {
+    if (productInStore?.products?.length <= 0) {
       setProductArr(data);
-    } else if (productInStore.products.length > 0) {
-
-      setProductArr(productInStore.products);
+    } else if (productInStore?.products?.length > 0) {
+      setProductArr(productInStore?.products);
     }
   }, [productInStore.products]);
 
@@ -180,17 +264,13 @@ export default function HomeScreen({ navigation }) {
             <>
               <View style={{ marginBottom: 40 }}>
                 <ContentHeader />
-                <TouchableWithoutFeedback
-                  onPress={
-                    () => navigation.navigate("Detail", { product: item })
-                    // addItemFavorite(item.id)
-                    // removeItemFavorite(item.id, item?.isFavorite)
-                  }
-                >
-                  <View>
-                    <Content image={item.image} />
-                  </View>
-                </TouchableWithoutFeedback>
+                <View>
+                  <Content
+                    image={item.image}
+                    navigation={navigation}
+                    product={item}
+                  />
+                </View>
               </View>
             </>
           );
@@ -200,9 +280,15 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
+const { width: SIZE } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   container: {
     height: 300,
     width: 300,
+  },
+  image: {
+    width: SIZE,
+    height: SIZE,
   },
 });
